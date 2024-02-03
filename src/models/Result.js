@@ -12,6 +12,7 @@ const ResultSchema = new Schema({
   projectKey: { type: String, require: true },
   beforeVersionId: { type: String, require: true },
   afterVersionId: { type: String, require: true },
+  pageId: { type: String, require: true },
   frames: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }],
   differences: [DifferenceSchema],
 });
