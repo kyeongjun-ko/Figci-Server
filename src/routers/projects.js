@@ -29,7 +29,7 @@ router.get("/:projectId/versions", async (req, res) => {
         return res.status(400).send({
           result: "error",
           error: {
-            message: "Bad Request",
+            message: "잘못된 사용자 요청입니다. Figma Token을 확인해주세요.",
           },
         });
       }
@@ -38,7 +38,7 @@ router.get("/:projectId/versions", async (req, res) => {
         return res.status(403).send({
           result: "error",
           error: {
-            message: "인증되지 않은 사용자 접근입니다.",
+            message: "인증되지 않은 사용자 ",
           },
         });
       }
@@ -47,7 +47,7 @@ router.get("/:projectId/versions", async (req, res) => {
         return res.status(404).send({
           result: "error",
           error: {
-            message: "존재하지 않는 피그마 파일입니다. 다시 입력해주세요",
+            message: "존재하지 않는 피그마 파일입니다. 다시 입력해주세요.",
           },
         });
       }
@@ -75,7 +75,7 @@ router.get("/:projectId/versions", async (req, res) => {
       return res.status(500).send({
         result: "error",
         error: {
-          message: "Internal Server Error",
+          message: "피그마 API로부터 응답이 없습니다.",
         },
       });
     }
