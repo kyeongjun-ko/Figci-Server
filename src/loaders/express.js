@@ -6,8 +6,8 @@ async function expressLoader(app) {
   app.use(
     cors({
       origin: CONFIG.CLIENT_URL,
-      credentials: true,
       methods: "GET, POST",
+      credentials: true,
       optionsSuccessStatus: 204,
     }),
   );
