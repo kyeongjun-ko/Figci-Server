@@ -70,7 +70,7 @@ router.get("/:projectId/versions", async (req, res) => {
         });
       }
 
-      return res.status(200).send(responseJson);
+      return res.status(200).json(responseJson);
     } catch (e) {
       return res.status(500).send({
         result: "error",
