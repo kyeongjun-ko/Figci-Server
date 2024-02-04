@@ -11,18 +11,19 @@ const NodeSchema = new Schema({
 
 const FrameSchema = new Schema({
   frameId: { type: String, require: true },
+  name: { type: String, require: true },
   nodes: [NodeSchema],
 });
 
 const PageSchema = new Schema({
   pageId: { type: String, require: true },
+  name: { type: String, require: true },
   frames: [FrameSchema],
 });
 
 const DocumentSchema = new Schema({
   projectKey: { type: String, require: true },
   versionId: { type: String, require: true },
-  name: { type: String, require: true },
   pages: [PageSchema],
 });
 
