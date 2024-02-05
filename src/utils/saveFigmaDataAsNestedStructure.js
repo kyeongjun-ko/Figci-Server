@@ -1,12 +1,12 @@
-const PAGE_UNIT_DEPTH = 1;
-const FRAME_UNIT_DEPTH = 2;
+const PAGE_NODE_DEPTH = 1;
+const FRAME_NODE_DEPTH = 2;
 
-async function saveFigmaDataAsNestedStructure(
+const saveFigmaDataAsNestedStructure = async (
   node,
   parent = null,
   depth = 0,
   currentFrameId = "",
-) {
+) => {
   if (depth === 0 && node.type === "DOCUMENT") {
     parent = { pages: [] };
   }
@@ -17,7 +17,7 @@ async function saveFigmaDataAsNestedStructure(
     });
   }
 
-  if (node.type === "CANVAS" && depth === PAGE_UNIT_DEPTH) {
+  if (node.type === "CANVAS" && depth === PAGE_NODE_DEPTH) {
     const newPage = { pageId: node.id, name: node.name, frames: [] };
 
     if (parent.pages) {
@@ -27,7 +27,7 @@ async function saveFigmaDataAsNestedStructure(
     node.children.forEach((child) =>
       saveFigmaDataAsNestedStructure(child, newPage, depth + 1),
     );
-  } else if (node.type === "FRAME" && depth === FRAME_UNIT_DEPTH) {
+  } else if (node.type === "FRAME" && depth === FRAME_NODE_DEPTH) {
     const newFrame = { frameId: node.id, name: node.name, nodes: [] };
 
     if (parent.frames) {
@@ -37,7 +37,7 @@ async function saveFigmaDataAsNestedStructure(
     node.children.forEach((child) =>
       saveFigmaDataAsNestedStructure(child, newFrame, depth + 1),
     );
-  } else if (depth > FRAME_UNIT_DEPTH) {
+  } else if (depth > FRAME_NODE_DEPTH) {
     const newNode = {
       nodeId: node.id,
       type: node.type,
@@ -54,11 +54,13 @@ async function saveFigmaDataAsNestedStructure(
       "children",
     ];
 
-    Object.keys(node).forEach((key) => {
-      if (!excludedKeys.includes(key)) {
-        newNode.property[key] = node[key];
+    for (const key in node) {
+      if (Object.prototype.hasOwnProperty.call(node, key)) {
+        if (!excludedKeys.includes(key)) {
+          newNode.property[key] = node[key];
+        }
       }
-    });
+    }
 
     if (parent.nodes) {
       parent.nodes.push(newNode);
@@ -66,6 +68,6 @@ async function saveFigmaDataAsNestedStructure(
   }
 
   return parent;
-}
+};
 
 module.exports = saveFigmaDataAsNestedStructure;
