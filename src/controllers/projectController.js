@@ -15,7 +15,7 @@ const getAllVersions = async (req, res, next) => {
       {
         method: "GET",
         headers: {
-          "X-FIGMA_TOKEN": accessToken,
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     );
@@ -47,7 +47,7 @@ const getCommonPages = async (req, res, next) => {
     const responseJson = await fetch(figmaUrl, {
       method: "GET",
       headers: {
-        "X-FIGMA-TOKEN": accessToken,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     const data = await responseJson.json();
