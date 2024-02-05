@@ -24,5 +24,6 @@ module.exports = {
     semi: "warn",
     "no-unused-vars": "warn",
     "no-param-reassign": 0,
+    "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
   },
 };
