@@ -25,5 +25,7 @@ module.exports = {
     "no-unused-vars": "warn",
     "no-param-reassign": 0,
     "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
+    "array-callback-return": "off",
+    "consistent-return": "off",
   },
 };
