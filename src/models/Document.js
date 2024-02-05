@@ -5,26 +5,35 @@ const { Schema } = mongoose;
 const NodeSchema = new Schema({
   nodeId: { type: String, require: true },
   type: { type: String, require: true },
-  children: { type: Array, require: true },
+  children: { type: Object, require: true },
   property: { type: Object, require: true },
 });
 
 const FrameSchema = new Schema({
   frameId: { type: String, require: true },
   name: { type: String, require: true },
-  nodes: [NodeSchema],
+  nodes: {
+    type: Map,
+    of: NodeSchema,
+  },
 });
 
 const PageSchema = new Schema({
   pageId: { type: String, require: true },
   name: { type: String, require: true },
-  frames: [FrameSchema],
+  frames: {
+    type: Map,
+    of: FrameSchema,
+  },
 });
 
 const DocumentSchema = new Schema({
   projectKey: { type: String, require: true },
   versionId: { type: String, require: true },
-  pages: [PageSchema],
+  pages: {
+    type: Map,
+    of: PageSchema,
+  },
 });
 
 module.exports = mongoose.model("Document", DocumentSchema);
