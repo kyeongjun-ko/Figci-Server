@@ -1,17 +1,17 @@
+/* eslint-disable-next-line array-callback-return */
+
 function comparePages(beforePages, afterPages) {
-  const matchedPages = [];
+  const beforePageIdList = Array.from(beforePages.keys());
+  const afterPageIdList = Array.from(afterPages.keys());
 
-  beforePages.forEach((beforePage) => {
-    const matchedPage = afterPages.find(
-      (afterPage) => afterPage.pageId === beforePage.pageId,
-    );
-
-    if (matchedPage) {
-      matchedPages.push(matchedPage);
+  return beforePageIdList.map((beforePageId) => {
+    if (afterPageIdList.includes(beforePageId)) {
+      return {
+        pageId: beforePageId,
+        pageName: beforePages.get(beforePageId).name,
+      };
     }
   });
-
-  return matchedPages;
 }
 
 module.exports = comparePages;
