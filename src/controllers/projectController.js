@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const Document = require("../models/Document");
 
 const comparePages = require("../utils/comparePages");
@@ -28,11 +29,9 @@ const getAllVersions = async (req, res, next) => {
       });
     }
 
-    return res.status(200).json(responseJson);
+    res.status(200).json(responseJson);
   } catch (err) {
     next(err);
-
-    return undefined;
   }
 };
 
@@ -95,11 +94,9 @@ const getCommonPages = async (req, res, next) => {
       afterDocument.pages,
     );
 
-    return res.status(200).json(matchedPages);
+    res.status(200).json(matchedPages);
   } catch (err) {
     next(err);
-
-    return undefined;
   }
 };
 
