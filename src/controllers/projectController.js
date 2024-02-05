@@ -2,8 +2,9 @@ const Document = require("../models/Document");
 
 const comparePages = require("../utils/comparePages");
 const saveFigmaDataAsNestedStructure = require("../utils/saveFigmaDataAsNestedStructure");
+const CONSTANT = require("../constants/constants");
 
-exports.getAllVersions = async function (req, res) {
+const getAllVersions = async (req, res, next) => {
   const { projectId } = req.params;
   const accessToken = req.headers.authorization;
 
@@ -13,77 +14,35 @@ exports.getAllVersions = async function (req, res) {
       {
         method: "GET",
         headers: {
-          "X-FIGMA-TOKEN": accessToken,
+          "X-FIGMA_TOKEN": accessToken,
         },
       },
     );
 
     const responseJson = await getVersions.json();
-    const { status, versions } = responseJson;
+    const { versions } = responseJson;
 
-    if (status === 400) {
-      return res.status(400).send({
-        result: "error",
-        error: {
-          message: "잘못된 사용자 요청입니다. Figma Token을 확인해주세요.",
-        },
-      });
-    }
-
-    if (status === 403) {
-      return res.status(403).send({
-        result: "error",
-        error: {
-          message: "인증되지 않은 사용자입니다.",
-        },
-      });
-    }
-
-    if (status === 404) {
-      return res.status(404).send({
-        result: "error",
-        error: {
-          message: "존재하지 않는 피그마 파일입니다. 다시 입력해주세요.",
-        },
-      });
-    }
-
-    if (status === 500) {
-      return res.status(500).send({
-        result: "error",
-        error: {
-          message: "프로젝트 용량이 너무 커 응답에 실패했습니다.",
-        },
-      });
-    }
-
-    if (versions.length < 2) {
+    if (versions.length < CONSTANT.NO_PREVIOUS_VERSIONS) {
       return res.status(502).send({
-        result: "error",
-        error: {
-          message: "비교할 수 있는 버전이 없어서 서비스 이용이 불가합니다.",
-        },
+        error: "해당 파일은 비교할 수 있는 버전이 없어요.",
       });
     }
 
     return res.status(200).json(responseJson);
   } catch (err) {
-    return res.status(500).send({
-      result: "error",
-      error: {
-        message: "피그마 API로부터 응답이 없습니다.",
-      },
-    });
+    next(err);
+
+    return undefined;
   }
 };
 
-exports.getCommonPages = async function (req, res) {
+const getCommonPages = async (req, res, next) => {
   const { projectId } = req.params;
   const accessToken = req.headers.authorization;
   const beforeVersion = req.query["before-version"];
   const afterVersion = req.query["after-version"];
 
-  async function fetchFigmaData(projectKey, versionId) {
+  const fetchFigmaData = async (projectKey, versionId) => {
     const figmaUrl = `https://api.figma.com/v1/files/${projectKey}?version=${versionId}`;
 
     const responseJson = await fetch(figmaUrl, {
@@ -95,20 +54,20 @@ exports.getCommonPages = async function (req, res) {
     const data = await responseJson.json();
 
     return data;
-  }
+  };
 
-  async function getDocument(projectKey, versionId) {
+  const getDocument = async (projectKey, versionId) => {
     const document = await Document.findOne({
       projectKey,
       versionId,
     });
 
     return document;
-  }
+  };
 
-  async function createDocument(projectKey, versionId) {
+  const createDocument = async (projectKey, versionId) => {
     const figmaData = await fetchFigmaData(projectKey, versionId);
-    let document = await saveFigmaDataAsNestedStructure(
+    const document = await saveFigmaDataAsNestedStructure(
       figmaData.document,
       null,
       0,
@@ -117,22 +76,19 @@ exports.getCommonPages = async function (req, res) {
     document.projectKey = projectKey;
     document.versionId = versionId;
 
-    document = await Document.create(document);
+    const flattenedDocument = await Document.create(document);
 
-    return document;
-  }
+    return flattenedDocument;
+  };
 
   try {
-    let beforeDocument = await getDocument(projectId, beforeVersion);
-    let afterDocument = await getDocument(projectId, afterVersion);
+    const beforeDocument =
+      (await getDocument(projectId, beforeVersion)) ||
+      (await createDocument(projectId, beforeVersion));
 
-    if (!beforeDocument) {
-      beforeDocument = await createDocument(projectId, beforeVersion);
-    }
-
-    if (!afterDocument) {
-      afterDocument = await createDocument(projectId, afterVersion);
-    }
+    const afterDocument =
+      (await getDocument(projectId, afterVersion)) ||
+      (await createDocument(projectId, afterVersion));
 
     const matchedPages = comparePages(
       beforeDocument.pages,
@@ -141,11 +97,10 @@ exports.getCommonPages = async function (req, res) {
 
     return res.status(200).json(matchedPages);
   } catch (err) {
-    return res.status(500).send({
-      result: "error",
-      error: {
-        message: "피그마 API로부터 응답이 없습니다.",
-      },
-    });
+    next(err);
+
+    return undefined;
   }
 };
+
+module.exports = { getAllVersions, getCommonPages };
