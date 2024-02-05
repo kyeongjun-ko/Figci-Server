@@ -9,7 +9,7 @@ const ERROR_PATTERNS = {
   },
   BAD_REQUEST: {
     status: 400,
-    message: "Bad Request: 잘못된 요청입니다. ",
+    message: "Bad Request: 잘못된 요청입니다.",
   },
   SERVER_ERROR: {
     status: 500,

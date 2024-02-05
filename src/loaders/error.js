@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 
-const errorHandlerLoader = (app) => {
+const errorLoader = (app) => {
   app.use((req, res, next) => {
     next(createError(404));
   });
@@ -10,8 +10,8 @@ const errorHandlerLoader = (app) => {
     res.locals.error = req.app.get("env") === "development" ? err : {};
 
     res.status(err.status || 500);
-    res.json({ message: err.message });
+    res.json({ result: "error", status: err.status, message: err.message });
   });
 };
 
-module.exports = errorHandlerLoader;
+module.exports = errorLoader;
