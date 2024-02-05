@@ -1,9 +1,11 @@
 /* eslint-disable consistent-return */
+const createHttpError = require("http-errors");
 const Document = require("../models/Document");
 
 const comparePages = require("../utils/comparePages");
 const saveFigmaDataAsNestedStructure = require("../utils/saveFigmaDataAsNestedStructure");
 const CONSTANT = require("../constants/constants");
+const ERROR_MESSAGE = require("../constants/error");
 
 const getAllVersions = async (req, res, next) => {
   const { projectId } = req.params;
@@ -24,14 +26,21 @@ const getAllVersions = async (req, res, next) => {
     const { versions } = responseJson;
 
     if (versions.length < CONSTANT.NO_PREVIOUS_VERSIONS) {
-      return res.status(502).send({
-        error: "해당 파일은 비교할 수 있는 버전이 없어요.",
+      return res.json({
+        result: "error",
+        status: 502,
+        message: "해당 파일은 비교할 수 있는 버전이 없어요.",
       });
     }
 
     res.status(200).json(responseJson);
   } catch (err) {
-    next(err);
+    const customError = createHttpError(
+      ERROR_MESSAGE.SERVER_ERROR.status,
+      ERROR_MESSAGE.SERVER_ERROR.message,
+    );
+
+    next(customError);
   }
 };
 
@@ -50,9 +59,9 @@ const getCommonPages = async (req, res, next) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    const data = await responseJson.json();
+    const projectVersionSubtree = await responseJson.json();
 
-    return data;
+    return projectVersionSubtree;
   };
 
   const getDocument = async (projectKey, versionId) => {
@@ -96,7 +105,12 @@ const getCommonPages = async (req, res, next) => {
 
     res.status(200).json(matchedPages);
   } catch (err) {
-    next(err);
+    const customError = createHttpError(
+      ERROR_MESSAGE.SERVER_ERROR.status,
+      ERROR_MESSAGE.SERVER_ERROR.message,
+    );
+
+    next(customError);
   }
 };
 
