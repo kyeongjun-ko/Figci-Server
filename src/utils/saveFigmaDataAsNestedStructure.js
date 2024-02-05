@@ -1,5 +1,4 @@
-const PAGE_NODE_DEPTH = 1;
-const FRAME_NODE_DEPTH = 2;
+const CONSTANT = require("../constants/constants");
 
 const saveFigmaDataAsNestedStructure = async (
   node,
@@ -17,7 +16,7 @@ const saveFigmaDataAsNestedStructure = async (
     });
   }
 
-  if (node.type === "CANVAS" && depth === PAGE_NODE_DEPTH) {
+  if (node.type === "CANVAS" && depth === CONSTANT.PAGE_NODE_DEPTH) {
     const newPage = { pageId: node.id, name: node.name, frames: [] };
 
     if (parent.pages) {
@@ -27,7 +26,7 @@ const saveFigmaDataAsNestedStructure = async (
     node.children.forEach((child) =>
       saveFigmaDataAsNestedStructure(child, newPage, depth + 1),
     );
-  } else if (node.type === "FRAME" && depth === FRAME_NODE_DEPTH) {
+  } else if (node.type === "FRAME" && depth === CONSTANT.FRAME_NODE_DEPTH) {
     const newFrame = { frameId: node.id, name: node.name, nodes: [] };
 
     if (parent.frames) {
@@ -37,7 +36,7 @@ const saveFigmaDataAsNestedStructure = async (
     node.children.forEach((child) =>
       saveFigmaDataAsNestedStructure(child, newFrame, depth + 1),
     );
-  } else if (depth > FRAME_NODE_DEPTH) {
+  } else if (depth > CONSTANT.FRAME_NODE_DEPTH) {
     const newNode = {
       nodeId: node.id,
       type: node.type,
