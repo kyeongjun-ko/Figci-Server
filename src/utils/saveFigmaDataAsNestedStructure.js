@@ -7,7 +7,7 @@ const saveFigmaDataAsNestedStructure = async (
   currentFrameId = "",
 ) => {
   if (depth === 0 && node.type === "DOCUMENT") {
-    parent = { pages: [] };
+    parent = { pages: {} };
   }
 
   if (node.children) {
@@ -17,20 +17,28 @@ const saveFigmaDataAsNestedStructure = async (
   }
 
   if (node.type === "CANVAS" && depth === CONSTANT.PAGE_NODE_DEPTH) {
-    const newPage = { pageId: node.id, name: node.name, frames: [] };
+    const newPage = {
+      pageId: node.id,
+      name: node.name,
+      frames: {},
+    };
 
     if (parent.pages) {
-      parent.pages.push(newPage);
+      parent.pages[newPage.pageId] = newPage;
     }
 
     node.children.forEach((child) =>
       saveFigmaDataAsNestedStructure(child, newPage, depth + 1),
     );
   } else if (node.type === "FRAME" && depth === CONSTANT.FRAME_NODE_DEPTH) {
-    const newFrame = { frameId: node.id, name: node.name, nodes: [] };
+    const newFrame = {
+      frameId: node.id,
+      name: node.name,
+      nodes: {},
+    };
 
     if (parent.frames) {
-      parent.frames.push(newFrame);
+      parent.frames[newFrame.frameId] = newFrame;
     }
 
     node.children.forEach((child) =>
@@ -41,8 +49,8 @@ const saveFigmaDataAsNestedStructure = async (
       nodeId: node.id,
       type: node.type,
       frameId: currentFrameId,
+      property: {},
     };
-    newNode.property = {};
 
     const excludedKeys = [
       "id",
@@ -62,7 +70,7 @@ const saveFigmaDataAsNestedStructure = async (
     }
 
     if (parent.nodes) {
-      parent.nodes.push(newNode);
+      parent.nodes[newNode.nodeId] = newNode;
     }
   }
 
