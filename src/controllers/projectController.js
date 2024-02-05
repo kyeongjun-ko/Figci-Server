@@ -5,7 +5,7 @@ const Document = require("../models/Document");
 const comparePages = require("../utils/comparePages");
 const saveFigmaDataAsNestedStructure = require("../utils/saveFigmaDataAsNestedStructure");
 const CONSTANT = require("../constants/constants");
-const ERROR_MESSAGE = require("../constants/error");
+const ERROR = require("../constants/error");
 
 const getAllVersions = async (req, res, next) => {
   const { projectId } = req.params;
@@ -36,8 +36,8 @@ const getAllVersions = async (req, res, next) => {
     res.status(200).json(responseJson);
   } catch (err) {
     const customError = createHttpError(
-      ERROR_MESSAGE.SERVER_ERROR.status,
-      ERROR_MESSAGE.SERVER_ERROR.message,
+      ERROR.SERVER_ERROR.status,
+      ERROR.SERVER_ERROR.message,
     );
 
     next(customError);
@@ -106,8 +106,8 @@ const getCommonPages = async (req, res, next) => {
     res.status(200).json(matchedPages);
   } catch (err) {
     const customError = createHttpError(
-      ERROR_MESSAGE.SERVER_ERROR.status,
-      ERROR_MESSAGE.SERVER_ERROR.message,
+      ERROR.SERVER_ERROR.status,
+      ERROR.SERVER_ERROR.message,
     );
 
     next(customError);
