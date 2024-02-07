@@ -10,12 +10,12 @@ const CONSTANT = require("../constants/constants");
 const ERROR = require("../constants/error");
 
 const getAllVersions = async (req, res, next) => {
-  const { projectId } = req.params;
+  const { projectId: projectKey } = req.params;
   const accessToken = req.headers.authorization;
 
   try {
     const getVersions = await fetch(
-      `https://api.figma.com/v1/files/${projectId}/versions`,
+      `https://api.figma.com/v1/files/${projectKey}/versions`,
       {
         method: "GET",
         headers: {
@@ -47,10 +47,10 @@ const getAllVersions = async (req, res, next) => {
 };
 
 const getCommonPages = async (req, res, next) => {
-  const { projectId } = req.params;
+  const { projectId: projectKey } = req.params;
   const accessToken = req.headers.authorization;
-  const beforeVersion = req.query["before-version"];
-  const afterVersion = req.query["after-version"];
+  const beforeVersionId = req.query["before-version"];
+  const afterVersionId = req.query["after-version"];
 
   const fetchFigmaData = async (projectKey, versionId) => {
     const figmaUrl = `https://api.figma.com/v1/files/${projectKey}?version=${versionId}`;
@@ -85,12 +85,12 @@ const getCommonPages = async (req, res, next) => {
 
   try {
     const beforeDocument =
-      (await getDocument(projectId, beforeVersion)) ||
-      (await createDocument(projectId, beforeVersion));
+      (await getDocument(projectKey, beforeVersionId)) ||
+      (await createDocument(projectKey, beforeVersionId));
 
     const afterDocument =
-      (await getDocument(projectId, afterVersion)) ||
-      (await createDocument(projectId, afterVersion));
+      (await getDocument(projectKey, afterVersionId)) ||
+      (await createDocument(projectKey, afterVersionId));
 
     const matchedPages = comparePages(
       beforeDocument.pages,
