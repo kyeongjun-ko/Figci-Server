@@ -5,6 +5,7 @@ const Result = require("../models/Result");
 const comparePages = require("../utils/comparePages");
 const saveFigmaDataAsNestedStructure = require("../utils/saveFigmaDataAsNestedStructure");
 const getDiffing = require("../utils/getDiffing");
+const getDocument = require("../utils/getDocument");
 const CONSTANT = require("../constants/constants");
 const ERROR = require("../constants/error");
 
@@ -63,15 +64,6 @@ const getCommonPages = async (req, res, next) => {
     const projectVersionSubtree = await responseJson.json();
 
     return projectVersionSubtree;
-  };
-
-  const getDocument = async (projectKey, versionId) => {
-    const document = await Document.findOne({
-      projectKey,
-      versionId,
-    });
-
-    return document;
   };
 
   const createDocument = async (projectKey, versionId) => {
@@ -138,15 +130,6 @@ const createDiffingResult = async (
   afterVersionId,
   pageId,
 ) => {
-  const getDocument = async (projectKey, versionId) => {
-    const document = await Document.findOne({
-      projectKey,
-      versionId,
-    });
-
-    return document;
-  };
-
   const beforeDocument = await getDocument(projectKey, beforeVersionId);
   const afterDocument = await getDocument(projectKey, afterVersionId);
 
