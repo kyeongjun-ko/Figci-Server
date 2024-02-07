@@ -27,5 +27,9 @@ module.exports = {
     "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
     "array-callback-return": "off",
     "consistent-return": "off",
+    "no-continue": "off",
+    "no-underscore-dangle": "off",
+    "no-await-in-loop": "off",
+    "no-shadow": "off",
   },
 };
