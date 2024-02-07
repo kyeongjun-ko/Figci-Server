@@ -1,6 +1,4 @@
-/* eslint-disable-next-line array-callback-return */
-
-function comparePages(beforePages, afterPages) {
+const comparePages = (beforePages, afterPages) => {
   const beforePageIdList = Array.from(beforePages.keys());
   const afterPageIdList = Array.from(afterPages.keys());
 
@@ -12,6 +10,6 @@ function comparePages(beforePages, afterPages) {
       };
     }
   });
-}
+};
 
 module.exports = comparePages;
