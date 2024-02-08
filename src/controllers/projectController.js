@@ -35,7 +35,11 @@ const getAllVersions = async (req, res, next) => {
       });
     }
 
-    res.status(200).json(responseJson);
+    res.status(200).json({
+      result: "success",
+      status: 200,
+      content: versions,
+    });
   } catch (err) {
     const customError = createHttpError(
       ERROR.SERVER_ERROR.status,
@@ -97,7 +101,11 @@ const getCommonPages = async (req, res, next) => {
       afterDocument.pages,
     );
 
-    res.status(200).json(matchedPages);
+    res.status(200).json({
+      result: "success",
+      status: 200,
+      content: matchedPages,
+    });
   } catch (err) {
     const customError = createHttpError(
       ERROR.SERVER_ERROR.status,
@@ -198,7 +206,11 @@ const getDiffingResult = async (req, res, next) => {
       diffingResult.frames.push(modifiedFrame);
     }
 
-    res.status(200).json(diffingResult);
+    res.status(200).json({
+      result: "success",
+      status: 200,
+      content: diffingResult,
+    });
   } catch (err) {
     const customError = createHttpError(
       ERROR.SERVER_ERROR.status,
