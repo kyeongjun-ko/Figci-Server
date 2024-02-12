@@ -16,6 +16,7 @@ const FrameSchema = new Schema({
     type: Map,
     of: NodeSchema,
   },
+  property: { type: Object, require: true },
 });
 
 const PageSchema = new Schema({
