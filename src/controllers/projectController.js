@@ -28,9 +28,9 @@ const getAllVersions = async (req, res, next) => {
     const { versions } = responseJson;
 
     if (versions.length < CONSTANT.NO_PREVIOUS_VERSIONS) {
-      return res.json({
+      return res.status(204).json({
         result: "error",
-        status: 502,
+        status: 204,
         message: "해당 파일은 비교할 수 있는 버전이 없어요.",
       });
     }
@@ -191,6 +191,16 @@ const getDiffingResult = async (req, res, next) => {
         afterVersionId,
         pageId,
       ));
+
+    if (!diffingResult.frames.length) {
+      res.status(204).json({
+        result: "error",
+        status: 204,
+        message: "해당 페이지는 차이점이 없어요.",
+      });
+
+      return;
+    }
 
     const modifiedFrameIdList = diffingResult.frames;
     diffingResult.frames = [];
