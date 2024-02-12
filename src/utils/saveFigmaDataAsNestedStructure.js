@@ -1,80 +1,99 @@
 const CONSTANT = require("../constants/constants");
 
-const saveFigmaDataAsNestedStructure = async (
-  node,
-  parent = null,
-  depth = 0,
-  currentFrameId = "",
-) => {
-  if (depth === 0 && node.type === "DOCUMENT") {
-    parent = { pages: {} };
+const saveFigmaDataAsNestedStructure = (root) => {
+  if (!root || root.type !== "DOCUMENT") {
+    return null;
   }
 
-  if (node.children) {
-    node.children.forEach((child) => {
-      saveFigmaDataAsNestedStructure(child, parent, depth + 1);
-    });
-  }
+  const queue = [{ node: root, parent: null, depth: 0, currentFrameId: "" }];
+  const structure = { pages: {} };
 
-  if (node.type === "CANVAS" && depth === CONSTANT.PAGE_NODE_DEPTH) {
-    const newPage = {
-      pageId: node.id,
-      name: node.name,
-      frames: {},
-    };
+  while (queue.length > 0) {
+    const { node, parent, depth, currentFrameId } = queue.shift();
 
-    if (parent.pages) {
-      parent.pages[newPage.pageId] = newPage;
-    }
+    let newParent = parent;
 
-    node.children.forEach((child) =>
-      saveFigmaDataAsNestedStructure(child, newPage, depth + 1),
-    );
-  } else if (node.type === "FRAME" && depth === CONSTANT.FRAME_NODE_DEPTH) {
-    const newFrame = {
-      frameId: node.id,
-      name: node.name,
-      nodes: {},
-    };
+    if (node.type === "CANVAS" && depth === CONSTANT.PAGE_NODE_DEPTH) {
+      const newPage = {
+        pageId: node.id,
+        name: node.name,
+        frames: {},
+      };
 
-    if (parent.frames) {
-      parent.frames[newFrame.frameId] = newFrame;
-    }
+      structure.pages[newPage.pageId] = newPage;
 
-    node.children.forEach((child) =>
-      saveFigmaDataAsNestedStructure(child, newFrame, depth + 1),
-    );
-  } else if (depth > CONSTANT.FRAME_NODE_DEPTH) {
-    const newNode = {
-      nodeId: node.id,
-      type: node.type,
-      frameId: currentFrameId,
-      property: {},
-    };
+      newParent = newPage;
+    } else if (node.type === "FRAME" && depth === CONSTANT.FRAME_NODE_DEPTH) {
+      const newFrame = {
+        frameId: node.id,
+        name: node.name,
+        nodes: {},
+        property: {},
+      };
 
-    const excludedKeys = [
-      "id",
-      "name",
-      "type",
-      "scrollBehavior",
-      "blendMode",
-      "children",
-    ];
+      const excludedKeys = [
+        "id",
+        "name",
+        "type",
+        "scrollBehavior",
+        "blendMode",
+        "children",
+      ];
 
-    for (const key in node) {
-      if (Object.prototype.hasOwnProperty.call(node, key)) {
+      for (const key in node) {
         if (!excludedKeys.includes(key)) {
-          newNode.property[key] = node[key];
+          newFrame.property[key] = node[key];
         }
+      }
+
+      if (parent.frames) {
+        parent.frames[newFrame.frameId] = newFrame;
+      }
+
+      newParent = newFrame;
+    } else if (depth > CONSTANT.FRAME_NODE_DEPTH) {
+      const newNode = {
+        nodeId: node.id,
+        type: node.type,
+        frameId: currentFrameId,
+        property: {},
+      };
+
+      const excludedKeys = [
+        "id",
+        "name",
+        "type",
+        "scrollBehavior",
+        "blendMode",
+        "children",
+      ];
+
+      for (const key in node) {
+        if (Object.prototype.hasOwnProperty.call(node, key)) {
+          if (!excludedKeys.includes(key)) {
+            newNode.property[key] = node[key];
+          }
+        }
+      }
+
+      if (parent.nodes) {
+        parent.nodes[newNode.nodeId] = newNode;
       }
     }
 
-    if (parent.nodes) {
-      parent.nodes[newNode.nodeId] = newNode;
+    if (node.children) {
+      node.children.forEach((child) => {
+        queue.push({
+          node: child,
+          parent: newParent,
+          depth: depth + 1,
+          currentFrameId: node.type === "FRAME" ? node.id : currentFrameId,
+        });
+      });
     }
   }
 
-  return parent;
+  return structure;
 };
 
 module.exports = saveFigmaDataAsNestedStructure;
