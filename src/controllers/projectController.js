@@ -193,13 +193,11 @@ const getDiffingResult = async (req, res, next) => {
       ));
 
     if (!diffingResult.frames.length) {
-      res.status(204).json({
+      return res.status(204).json({
         result: "error",
         status: 204,
         message: "해당 페이지는 차이점이 없어요.",
       });
-
-      return;
     }
 
     const modifiedFrameIdList = diffingResult.frames;
