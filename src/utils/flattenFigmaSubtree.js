@@ -1,6 +1,6 @@
 const CONSTANT = require("../constants/constants");
 
-const saveFigmaDataAsNestedStructure = (root) => {
+const flattenFigmaSubtree = (root) => {
   if (!root || root.type !== "DOCUMENT") {
     return null;
   }
@@ -31,17 +31,8 @@ const saveFigmaDataAsNestedStructure = (root) => {
         property: {},
       };
 
-      const excludedKeys = [
-        "id",
-        "name",
-        "type",
-        "scrollBehavior",
-        "blendMode",
-        "children",
-      ];
-
       for (const key in node) {
-        if (!excludedKeys.includes(key)) {
+        if (!CONSTANT.EXCLUDED_KEYS[key]) {
           newFrame.property[key] = node[key];
         }
       }
@@ -59,18 +50,9 @@ const saveFigmaDataAsNestedStructure = (root) => {
         property: {},
       };
 
-      const excludedKeys = [
-        "id",
-        "name",
-        "type",
-        "scrollBehavior",
-        "blendMode",
-        "children",
-      ];
-
       for (const key in node) {
         if (Object.prototype.hasOwnProperty.call(node, key)) {
-          if (!excludedKeys.includes(key)) {
+          if (!CONSTANT.EXCLUDED_KEYS[key]) {
             newNode.property[key] = node[key];
           }
         }
@@ -96,4 +78,4 @@ const saveFigmaDataAsNestedStructure = (root) => {
   return structure;
 };
 
-module.exports = saveFigmaDataAsNestedStructure;
+module.exports = flattenFigmaSubtree;
