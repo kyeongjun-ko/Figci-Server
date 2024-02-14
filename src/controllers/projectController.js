@@ -1,6 +1,5 @@
 const createHttpError = require("http-errors");
 const Document = require("../models/Document");
-const Result = require("../models/Result");
 
 const comparePages = require("../utils/comparePages");
 const saveFigmaDataAsNestedStructure = require("../utils/saveFigmaDataAsNestedStructure");
@@ -28,7 +27,7 @@ const getAllVersions = async (req, res, next) => {
     const { versions } = responseJson;
 
     if (versions.length < CONSTANT.NO_PREVIOUS_VERSIONS) {
-      return res.status(204).json({
+      return res.status(200).json({
         result: "error",
         status: 204,
         message: "해당 파일은 비교할 수 있는 버전이 없어요.",
@@ -116,22 +115,6 @@ const getCommonPages = async (req, res, next) => {
   }
 };
 
-const getStoredDiffingResult = async (
-  projectKey,
-  beforeVersionId,
-  afterVersionId,
-  pageId,
-) => {
-  const storedDiffingResult = await Result.findOne({
-    projectKey,
-    beforeVersionId,
-    afterVersionId,
-    pageId,
-  });
-
-  return storedDiffingResult;
-};
-
 const createDiffingResult = async (
   projectKey,
   beforeVersionId,
@@ -149,27 +132,13 @@ const createDiffingResult = async (
     beforeVersionId,
     afterVersionId,
     pageId,
-    frames: new Set(),
+    frames: {},
     differences: {},
   };
 
   await getDiffing(beforeFrameList, afterFrameList, diffingResult);
 
-  const diffingInstance = await Result.create(diffingResult);
-
-  return diffingInstance;
-};
-
-const getModifiedFrame = async (projectKey, versionId, pageId, frameId) => {
-  const modifiedDocument = await Document.findOne({
-    projectKey,
-    versionId,
-  });
-
-  const modifiedPage = modifiedDocument.pages.get(pageId);
-  const modifiedFrame = modifiedPage.frames.get(frameId);
-
-  return modifiedFrame;
+  return diffingResult;
 };
 
 const getDiffingResult = async (req, res, next) => {
@@ -178,40 +147,21 @@ const getDiffingResult = async (req, res, next) => {
   const afterVersionId = req.query["after-version"];
 
   try {
-    const diffingResult =
-      (await getStoredDiffingResult(
-        projectKey,
-        beforeVersionId,
-        afterVersionId,
-        pageId,
-      )) ||
-      (await createDiffingResult(
-        projectKey,
-        beforeVersionId,
-        afterVersionId,
-        pageId,
-      ));
+    const diffingResult = await createDiffingResult(
+      projectKey,
+      beforeVersionId,
+      afterVersionId,
+      pageId,
+    );
 
-    if (!diffingResult.frames.length) {
-      return res.status(204).json({
+    const frameIdList = Object.keys(diffingResult.frames);
+
+    if (!frameIdList.length) {
+      return res.status(200).json({
         result: "error",
         status: 204,
         message: "해당 페이지는 차이점이 없어요.",
       });
-    }
-
-    const modifiedFrameIdList = diffingResult.frames;
-    diffingResult.frames = [];
-
-    for (const modifiedFrameId of modifiedFrameIdList) {
-      const modifiedFrame = await getModifiedFrame(
-        projectKey,
-        afterVersionId,
-        pageId,
-        modifiedFrameId,
-      );
-
-      diffingResult.frames.push(modifiedFrame);
     }
 
     res.status(200).json({

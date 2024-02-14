@@ -6,6 +6,7 @@ const diffProperties = (
   beforeProperties,
   afterProperties,
   frameId,
+  frame,
   nodeId,
   position,
   diffingResult,
@@ -26,6 +27,7 @@ const diffProperties = (
           beforeValue,
           afterValue,
           frameId,
+          frame,
           nodeId,
           position,
           diffingResult,
@@ -52,7 +54,7 @@ const diffProperties = (
         diffingResult.differences[nodeId].differenceInformation[propertyRoute] =
           `${beforeValue} => ${afterValue}`;
 
-        diffingResult.frames.add(frameId);
+        diffingResult.frames[frameId] = frame;
       }
     }
   }
@@ -61,9 +63,8 @@ const diffProperties = (
 const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
   for (const [afterFrameId, afterFrame] of afterFrameList) {
     const beforeFrame = beforeFrameList.get(afterFrameId);
-
     if (!beforeFrame) {
-      diffingResult.frames.add(afterFrameId);
+      diffingResult.frames[afterFrameId] = afterFrame;
 
       continue;
     }
@@ -81,6 +82,8 @@ const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
           position: nodePosition,
         };
 
+        diffingResult.frames[afterFrameId] = afterFrame;
+
         continue;
       }
 
@@ -88,6 +91,7 @@ const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
         beforeNode,
         afterNode,
         afterFrameId,
+        afterFrame,
         afterNodeId,
         nodePosition,
         diffingResult,
@@ -96,8 +100,6 @@ const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
       );
     }
   }
-
-  diffingResult.frames = Array.from(diffingResult.frames);
 };
 
 module.exports = getDiffing;
