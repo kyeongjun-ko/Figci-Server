@@ -26,7 +26,7 @@ const getAllVersions = async (req, res, next) => {
     const responseJson = await getVersions.json();
     const { versions } = responseJson;
 
-    if (versions.length < CONSTANT.NO_PREVIOUS_VERSIONS) {
+    if (versions.length < CONSTANT.COMPARABLE_VERSION_NUMBER) {
       return res.status(200).json({
         result: "error",
         status: 204,
