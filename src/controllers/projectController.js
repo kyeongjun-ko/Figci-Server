@@ -2,7 +2,7 @@ const createHttpError = require("http-errors");
 const Document = require("../models/Document");
 
 const comparePages = require("../utils/comparePages");
-const saveFigmaDataAsNestedStructure = require("../utils/saveFigmaDataAsNestedStructure");
+const flattenFigmaSubtree = require("../utils/flattenFigmaSubtree");
 const getDiffing = require("../utils/getDiffing");
 const getDocument = require("../utils/getDocument");
 const CONSTANT = require("../constants/constants");
@@ -72,11 +72,7 @@ const getCommonPages = async (req, res, next) => {
   const createDocument = async (projectKey, versionId) => {
     const figmaData = await fetchFigmaData(projectKey, versionId);
 
-    const document = await saveFigmaDataAsNestedStructure(
-      figmaData.document,
-      null,
-      0,
-    );
+    const document = await flattenFigmaSubtree(figmaData.document);
 
     document.projectKey = projectKey;
     document.versionId = versionId;

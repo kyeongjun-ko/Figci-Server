@@ -12,11 +12,11 @@ const NodeSchema = new Schema({
 const FrameSchema = new Schema({
   frameId: { type: String, require: true },
   name: { type: String, require: true },
+  property: { type: Object, require: true },
   nodes: {
     type: Map,
     of: NodeSchema,
   },
-  property: { type: Object, require: true },
 });
 
 const PageSchema = new Schema({
