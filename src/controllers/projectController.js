@@ -24,6 +24,15 @@ const getAllVersions = async (req, res, next) => {
     );
 
     const responseJson = await getVersions.json();
+
+    if (responseJson.status === 403) {
+      return res.status(200).json({
+        result: "error",
+        status: 403,
+        message: "Invalid Token",
+      });
+    }
+
     const { versions } = responseJson;
 
     if (versions.length < CONSTANT.COMPARABLE_VERSION_NUMBER) {
