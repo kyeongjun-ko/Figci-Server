@@ -81,7 +81,7 @@ const getCommonPages = async (req, res, next) => {
   const createDocument = async (projectKey, versionId) => {
     const figmaData = await fetchFigmaData(projectKey, versionId);
 
-    const document = await flattenFigmaSubtree(figmaData.document);
+    const document = flattenFigmaSubtree(figmaData.document);
 
     document.projectKey = projectKey;
     document.versionId = versionId;
