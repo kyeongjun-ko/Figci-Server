@@ -1,4 +1,8 @@
+const createHttpError = require("http-errors");
+
 const generateApiUri = require("../utils/generateURI");
+
+const ERROR = require("../constants/error");
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
@@ -18,14 +22,23 @@ const requestToken = async (req, res, next) => {
     grant_type: "authorization_code",
   };
 
-  const API_URI = generateApiUri(figmaURI, "api/oauth/token", queryParams);
+  try {
+    const API_URI = generateApiUri(figmaURI, "api/oauth/token", queryParams);
 
-  const response = await fetch(API_URI, { method: "POST" });
-  const responseJson = await response.json();
+    const response = await fetch(API_URI, { method: "POST" });
+    const responseJson = await response.json();
 
-  accessToken = responseJson.access_token;
+    accessToken = responseJson.access_token;
 
-  res.status(200).render("connect");
+    res.status(200).render("connect");
+  } catch (err) {
+    const customError = createHttpError(
+      ERROR.SERVER_ERROR.status,
+      ERROR.SERVER_ERROR.message,
+    );
+
+    next(customError);
+  }
 };
 
 const getToken = (req, res, next) => {
