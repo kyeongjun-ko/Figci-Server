@@ -42,7 +42,11 @@ const requestToken = async (req, res, next) => {
 };
 
 const getToken = (req, res, next) => {
-  res.status(200).json({ accessToken });
+  res.status(200).json({
+    result: "success",
+    status: 200,
+    content: accessToken,
+  });
 
   accessToken = "";
 };
