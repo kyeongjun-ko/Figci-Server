@@ -11,6 +11,7 @@ const errorLoader = (app) => {
 
     res.status(err.status || 500);
     res.json({ result: "error", status: err.status, message: err.message });
+    console.error(err);
   });
 };
 

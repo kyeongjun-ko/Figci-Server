@@ -1,10 +1,12 @@
 const createHttpError = require("http-errors");
+
 const Document = require("../models/Document");
 
 const comparePages = require("../utils/comparePages");
 const flattenFigmaSubtree = require("../utils/flattenFigmaSubtree");
 const getDiffing = require("../utils/getDiffing");
 const getDocument = require("../utils/getDocument");
+
 const CONSTANT = require("../constants/constants");
 const ERROR = require("../constants/error");
 
