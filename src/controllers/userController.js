@@ -22,7 +22,11 @@ const getUserInformation = async (req, res, next) => {
       });
     }
 
-    res.status(200).json(myInformation);
+    res.status(200).json({
+      result: "success",
+      status: 200,
+      content: myInformation,
+    });
   } catch (err) {
     const customError = createHttpError(
       ERROR.SERVER_ERROR.status,
