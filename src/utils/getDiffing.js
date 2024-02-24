@@ -73,10 +73,9 @@ const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
       const beforeNode = beforeFrame.nodes.get(afterNodeId);
 
       if (!afterNode.property) {
-        console.log(afterNode);
-
         continue;
       }
+
       const nodePosition = afterNode.property.absoluteBoundingBox;
 
       if (!beforeNode) {
