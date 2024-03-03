@@ -1,19 +1,19 @@
 const ERROR_PATTERNS = {
   UNAUTHORIZED: {
     status: 401,
-    message: "Unauthorized: 유효한 인증 정보가 아닙니다.",
+    message: "Unauthorized",
   },
   NOT_FOUND: {
     status: 404,
-    message: "Not Found: 요청한 페이지를 찾을 수 없습니다.",
+    message: "Not Found",
   },
   BAD_REQUEST: {
     status: 400,
-    message: "Bad Request: 잘못된 요청입니다.",
+    message: "Bad Request",
   },
   SERVER_ERROR: {
     status: 500,
-    message: "Internal Server Error: 서버 통신이 원활하지 않습니다.",
+    message: "Internal Server Error",
   },
 };
 

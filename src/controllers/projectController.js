@@ -41,7 +41,7 @@ const getAllVersions = async (req, res, next) => {
       return res.status(200).json({
         result: "error",
         status: 204,
-        message: "해당 파일은 비교할 수 있는 버전이 없어요.",
+        message: "This file does not have any comparable versions.",
       });
     }
 
@@ -167,7 +167,7 @@ const getDiffingResult = async (req, res, next) => {
       return res.status(200).json({
         result: "error",
         status: 204,
-        message: "해당 페이지는 차이점이 없어요.",
+        message: "There are no differences on this page.",
       });
     }
 
