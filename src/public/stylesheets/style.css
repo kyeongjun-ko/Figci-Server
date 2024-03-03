@@ -18,10 +18,11 @@
 }
 
 .header .header-description {
-  font-size: 0.875;
-  font-family: Noto Sans KR;
-  font-weight: 700;
-  line-height: 20px;
+  color: #4d4d4d;
+  font-size: 0.875rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  line-height: 18px;
   letter-spacing: 0%;
 }
 
@@ -41,18 +42,18 @@
 .main .title {
   margin-bottom: 18px;
 
-  font-size: 2rem;
-  font-family: Noto Sans KR;
-  font-weight: 900;
-  line-height: 48px;
+  font-size: 1.875rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  line-height: 32px;
   text-align: center;
 }
 
 .main .main-description {
   color: #868e96;
   font-size: 1.25rem;
-  font-family: Noto Sans KR;
-  font-weight: 500;
-  line-height: 30px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+  line-height: 28px;
   text-align: center;
 }
