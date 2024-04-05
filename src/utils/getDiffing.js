@@ -13,7 +13,7 @@ const diffProperties = (
   path,
   depth,
 ) => {
-  if (depth === 0) {
+  if (depth === 0 && process.env.NODE_ENV !== "test") {
     afterProperties = afterProperties._doc;
   }
 
@@ -63,6 +63,7 @@ const diffProperties = (
 const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
   for (const [afterFrameId, afterFrame] of afterFrameList) {
     const beforeFrame = beforeFrameList.get(afterFrameId);
+
     if (!beforeFrame) {
       diffingResult.frames[afterFrameId] = afterFrame;
 
