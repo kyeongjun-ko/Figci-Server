@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     commonjs: true,
     es2021: true,
+    jest: true,
   },
   extends: ["airbnb", "airbnb/hooks", "plugin:prettier/recommended"],
   overrides: [
@@ -31,5 +32,6 @@ module.exports = {
     "no-underscore-dangle": "off",
     "no-await-in-loop": "off",
     "no-shadow": "off",
+    "import/no-extraneous-dependencies": "off",
   },
 };
