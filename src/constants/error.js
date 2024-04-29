@@ -15,6 +15,10 @@ const ERROR_PATTERNS = {
     status: 500,
     message: "Internal Server Error",
   },
+  SIZE_ERROR: {
+    status: 500,
+    message: "Can't access Figma info; file too large.🥲",
+  },
 };
 
 module.exports = ERROR_PATTERNS;
