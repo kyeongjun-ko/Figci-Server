@@ -118,6 +118,10 @@ const getCommonPages = async (req, res, next) => {
       ERROR.SERVER_ERROR.message,
     );
 
+    if (err.code === "ERR_OUT_OF_RANGE") {
+      customError.message = ERROR.SIZE_ERROR.message;
+    }
+
     next(customError);
   }
 };
