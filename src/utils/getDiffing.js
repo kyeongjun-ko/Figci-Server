@@ -14,7 +14,9 @@ const diffProperties = (
   depth,
 ) => {
   if (depth === 0 && process.env.NODE_ENV !== "test") {
-    afterProperties = afterProperties._doc;
+    if (afterProperties && afterProperties._doc) {
+      afterProperties = afterProperties._doc;
+    }
   }
 
   for (const property in afterProperties) {
