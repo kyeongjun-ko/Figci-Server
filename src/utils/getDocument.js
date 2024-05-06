@@ -1,4 +1,5 @@
 const Document = require("../models/Document");
+const { getDocumentFromGridFS } = require("./gridfsUtils");
 
 const getDocument = async (projectKey, versionId) => {
   const document = await Document.findOne({
@@ -6,7 +7,13 @@ const getDocument = async (projectKey, versionId) => {
     versionId,
   });
 
-  return document;
+  if (document) {
+    return document;
+  }
+
+  const documentFromGridFS = await getDocumentFromGridFS(projectKey, versionId);
+
+  return documentFromGridFS;
 };
 
 module.exports = getDocument;
