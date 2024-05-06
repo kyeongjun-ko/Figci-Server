@@ -10,6 +10,7 @@ const CONSTANTS = {
     blendMode: true,
     children: true,
   },
+  BUCKET_NAME: "documents",
 };
 
 module.exports = CONSTANTS;
