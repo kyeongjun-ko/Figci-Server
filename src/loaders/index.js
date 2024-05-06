@@ -1,4 +1,4 @@
-const mongooseLoader = require("./mongoose");
+const { mongooseLoader } = require("./mongoose");
 const expressLoader = require("./express");
 const routerLoader = require("./routers");
 const errorLoader = require("./error");
