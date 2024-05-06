@@ -6,6 +6,8 @@ const comparePages = require("../utils/comparePages");
 const flattenFigmaSubtree = require("../utils/flattenFigmaSubtree");
 const getDiffing = require("../utils/getDiffing");
 const getDocument = require("../utils/getDocument");
+const convertNodesToObject = require("../utils/convertNodesToObject");
+const { saveDocumentToGridFS } = require("../utils/gridfsUtils");
 
 const CONSTANT = require("../constants/constants");
 const ERROR = require("../constants/error");
@@ -82,15 +84,25 @@ const getCommonPages = async (req, res, next) => {
 
   const createDocument = async (projectKey, versionId) => {
     const figmaData = await fetchFigmaData(projectKey, versionId);
-
     const document = flattenFigmaSubtree(figmaData.document);
 
     document.projectKey = projectKey;
     document.versionId = versionId;
 
-    const flattenedDocument = await Document.create(document);
+    const documentSize = JSON.stringify(document).length;
 
-    return flattenedDocument;
+    if (documentSize <= 16 * 1024 * 1024) {
+      const flattenedDocument = await Document.create(document);
+
+      return flattenedDocument;
+    }
+    const gridFSDocument = await saveDocumentToGridFS(
+      document,
+      projectKey,
+      versionId,
+    );
+
+    return gridFSDocument;
   };
 
   try {
@@ -148,6 +160,8 @@ const createDiffingResult = async (
   };
 
   await getDiffing(beforeFrameList, afterFrameList, diffingResult);
+
+  diffingResult.frames = convertNodesToObject(diffingResult.frames);
 
   return diffingResult;
 };
