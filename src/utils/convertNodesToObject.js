@@ -10,3 +10,5 @@ const convertNodesToObject = (frames) => {
 
   return convertedFrames;
 };
+
+module.exports = convertNodesToObject;
