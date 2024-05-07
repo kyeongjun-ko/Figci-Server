@@ -6,23 +6,23 @@ const CONSTANT = require("../constants/constants");
 
 let bucket;
 
-const connectToMongoDB = async () => {
+const connectMongoDB = async () => {
   try {
     await mongoose.connect(CONFIG.MONGODB_ENDPOINT, { dbName: CONFIG.DB_NAME });
-    console.log("MongoDB connected");
   } catch (error) {
     console.error("MongoDB connection error:", error);
+
     throw error;
   }
 };
 
 const initBucket = async () => {
-  const db = mongoose.connection.client.db();
+  const db = mongoose.connection.client.db(CONFIG.DB_NAME);
   bucket = new GridFSBucket(db, { bucketName: CONSTANT.BUCKET_NAME });
 };
 
 const mongooseLoader = async () => {
-  await connectToMongoDB();
+  await connectMongoDB();
   await initBucket();
 };
 
