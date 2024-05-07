@@ -1,48 +1,83 @@
 const { getBucket } = require("../loaders/mongoose");
+
 const convertObjectToMap = require("./convertObjectToMap");
 
-const ERROR = require("../constants/error");
+const uploadFigmaJsonToGridFS = (uploadStream, figmaJsonData) => {
+  return new Promise((resolve, reject) => {
+    uploadStream.write(JSON.stringify(figmaJsonData));
+
+    uploadStream.on("error", (err) => {
+      console.error("GridFS upload failed:", err);
+
+      reject(err);
+    });
+
+    uploadStream.on("finish", () => {
+      resolve();
+    });
+
+    uploadStream.end();
+  });
+};
+
+const downloadStreamToBuffer = (downloadStream) => {
+  return new Promise((resolve, reject) => {
+    const gridFSFileChunks = [];
+
+    const timeout = setTimeout(() => {
+      downloadStream.destroy();
+
+      reject(new Error("GridFS retrieve timeout."));
+    }, 60000);
+
+    downloadStream.on("data", (chunk) => {
+      gridFSFileChunks.push(chunk);
+    });
+
+    downloadStream.on("end", () => {
+      const gridFSFileBuffer = Buffer.concat(gridFSFileChunks);
+
+      clearTimeout(timeout);
+      resolve(gridFSFileBuffer);
+    });
+
+    downloadStream.on("error", (err) => {
+      console.error("Error retrieving document from GridFS:", err);
+
+      clearTimeout(timeout);
+      reject(err);
+    });
+  });
+};
 
 const getDocumentFromGridFS = async (projectKey, versionId) => {
   const bucket = getBucket();
   const fileName = `${projectKey}_${versionId}.json`;
 
   const gridFSFiles = await bucket.find({ filename: fileName }).toArray();
-  const fileExists = gridFSFiles.length > 0;
 
-  if (!fileExists) {
+  if (gridFSFiles.length === 0) {
     return null;
   }
 
-  const downloadStream = bucket.openDownloadStreamByName(fileName);
+  try {
+    const downloadStream = bucket.openDownloadStreamByName(fileName);
 
-  const gridFSFileBuffer = await new Promise((resolve) => {
-    const gridFSFileChunks = [];
+    const gridFSFileBuffer = await downloadStreamToBuffer(downloadStream);
 
-    downloadStream.on("data", (chunk) => {
-      gridFSFileChunks.push(chunk);
-    });
+    if (gridFSFileBuffer) {
+      const gridFSFileContent = gridFSFileBuffer.toString();
+      const gridFSDocument = JSON.parse(gridFSFileContent);
+      const convertedDocument = convertObjectToMap(gridFSDocument);
 
-    downloadStream.once("end", () => {
-      resolve(Buffer.concat(gridFSFileChunks));
-    });
+      return convertedDocument;
+    }
+  } catch (error) {
+    console.error("Error retrieving document from GridFS:", error);
 
-    downloadStream.once("error", (err) => {
-      console.error("Error retrieving document from GridFS:", err);
-
-      resolve(null);
-    });
-  });
-
-  if (gridFSFileBuffer === null) {
-    return null;
+    throw error;
   }
-
-  const gridFSFileContent = gridFSFileBuffer.toString();
-  const gridFSDocument = JSON.parse(gridFSFileContent);
-  const convertedDocument = convertObjectToMap(gridFSDocument);
-
-  return convertedDocument;
+  return null;
 };
 
 const saveDocumentToGridFS = async (
@@ -53,33 +88,21 @@ const saveDocumentToGridFS = async (
   const bucket = getBucket();
   const fileName = `${projectKey}_${versionId}.json`;
 
-  const uploadStream = bucket.openUploadStream(fileName, {
-    contentType: "application/json",
-  });
-
-  uploadStream.write(JSON.stringify(flattenFigmaJson));
-
-  await new Promise((resolve, reject) => {
-    uploadStream.once("error", (err) => {
-      console.error("Upload failed:", err);
-      reject(err);
+  try {
+    const uploadStream = bucket.openUploadStream(fileName, {
+      contentType: "application/json",
     });
 
-    uploadStream.once("finish", resolve);
-    uploadStream.end();
-  });
+    await uploadFigmaJsonToGridFS(uploadStream, flattenFigmaJson);
 
-  const uploadedFiles = await bucket.find({ filename: fileName }).toArray();
+    const convertedDocument = convertObjectToMap(flattenFigmaJson);
 
-  if (uploadedFiles.length > 0) {
-    const savedGridFSDocument = await getDocumentFromGridFS(
-      projectKey,
-      versionId,
-    );
+    return convertedDocument;
+  } catch (error) {
+    console.error("Error saving document to GridFS:", error);
 
-    return savedGridFSDocument;
+    throw error;
   }
-  throw new Error(ERROR.GRIDFS_UPLOAD_ERROR.message);
 };
 
 module.exports = { getDocumentFromGridFS, saveDocumentToGridFS };
