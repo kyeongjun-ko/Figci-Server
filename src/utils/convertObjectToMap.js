@@ -1,33 +1,27 @@
-const convertObjectToMap = (obj) => {
-  if (obj && typeof obj === "object") {
-    if (Array.isArray(obj)) {
-      return obj.map(convertObjectToMap);
+const convertObjectToMap = (gridFSObject) => {
+  if (gridFSObject && typeof gridFSObject === "object") {
+    if (Array.isArray(gridFSObject)) {
+      return gridFSObject.map(convertObjectToMap);
     }
-    const convertedObj = {};
+    const convertedObject = {};
 
-    for (const key in obj) {
-      if (key === "pages" || key === "frames") {
-        convertedObj[key] = new Map(
-          Object.entries(obj[key]).map(([pageId, pageValue]) => [
-            pageId,
-            convertObjectToMap(pageValue),
-          ]),
-        );
-      } else if (key === "nodes") {
-        convertedObj[key] = new Map(
-          Object.entries(obj[key]).map(([nodeId, nodeValue]) => {
-            const { frameId, ...rest } = nodeValue;
+    for (const key in gridFSObject) {
+      if (key === "pages" || key === "frames" || key === "nodes") {
+        const convertedMap = new Map();
 
-            return [nodeId, convertObjectToMap(rest)];
-          }),
-        );
+        for (const [pageId, pageNodes] of Object.entries(gridFSObject[key])) {
+          convertedMap.set(pageId, convertObjectToMap(pageNodes));
+          convertedMap[pageId] = convertObjectToMap(pageNodes);
+        }
+
+        convertedObject[key] = convertedMap;
       } else {
-        convertedObj[key] = convertObjectToMap(obj[key]);
+        convertedObject[key] = convertObjectToMap(gridFSObject[key]);
       }
     }
-    return convertedObj;
+    return convertedObject;
   }
-  return obj;
+  return gridFSObject;
 };
 
 module.exports = convertObjectToMap;
