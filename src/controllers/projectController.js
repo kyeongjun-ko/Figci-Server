@@ -6,7 +6,6 @@ const comparePages = require("../utils/comparePages");
 const flattenFigmaSubtree = require("../utils/flattenFigmaSubtree");
 const getDiffing = require("../utils/getDiffing");
 const getDocument = require("../utils/getDocument");
-const convertNodesToObject = require("../utils/convertNodesToObject");
 const { saveDocumentToGridFS } = require("../utils/gridfsUtils");
 
 const CONSTANT = require("../constants/constants");
@@ -157,8 +156,6 @@ const createDiffingResult = async (
   };
 
   await getDiffing(beforeFrameList, afterFrameList, diffingResult);
-
-  diffingResult.frames = convertNodesToObject(diffingResult.frames);
 
   return diffingResult;
 };
