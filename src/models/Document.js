@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const NodeSchema = new Schema({
   nodeId: { type: String, require: true },
   type: { type: String, require: true },
-  children: { type: Object, require: true },
+  frameId: { type: String, require: true },
   property: { type: Object, require: true },
 });
 
