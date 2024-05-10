@@ -1,30 +1,13 @@
 const comparePages = (beforePages, afterPages) => {
-  let afterPageIdList = [];
-
-  if (afterPages instanceof Map) {
-    afterPageIdList = Array.from(afterPages.keys());
-  } else if (typeof afterPages === "object") {
-    afterPageIdList = Object.keys(afterPages);
-  }
+  const afterPageIdList = Array.from(afterPages.keys());
 
   const commonPageList = [];
 
   for (const afterPageId of afterPageIdList) {
-    if (beforePages instanceof Map && beforePages.has(afterPageId)) {
+    if (beforePages.get(afterPageId)) {
       commonPageList.push({
         pageId: afterPageId,
-        pageName:
-          afterPages instanceof Map
-            ? afterPages.get(afterPageId).name
-            : afterPages[afterPageId].name,
-      });
-    } else if (typeof beforePages === "object" && beforePages[afterPageId]) {
-      commonPageList.push({
-        pageId: afterPageId,
-        pageName:
-          afterPages instanceof Map
-            ? afterPages.get(afterPageId).name
-            : afterPages[afterPageId].name,
+        pageName: afterPages.get(afterPageId).name,
       });
     }
   }
