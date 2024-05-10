@@ -2,21 +2,21 @@ const { getBucket } = require("../loaders/mongoose");
 
 const convertObjectToMap = require("./convertObjectToMap");
 
-const uploadFigmaJsonToGridFS = (uploadStream, figmaJsonData) => {
-  return new Promise((resolve, reject) => {
+const uploadStreamToGridFS = (uploadStream, figmaJsonData) => {
+  return new Promise((resolve) => {
     uploadStream.write(JSON.stringify(figmaJsonData));
+
+    uploadStream.on("finish", () => {
+      resolve(figmaJsonData);
+    });
+
+    uploadStream.end();
 
     uploadStream.on("error", (err) => {
       console.error("GridFS upload failed:", err);
 
-      reject(err);
+      resolve(null);
     });
-
-    uploadStream.on("finish", () => {
-      resolve();
-    });
-
-    uploadStream.end();
   });
 };
 
@@ -37,7 +37,6 @@ const downloadStreamToBuffer = (downloadStream) => {
     downloadStream.on("error", (err) => {
       console.error("Error retrieving document from GridFS:", err.message);
 
-      // reject(err.message);
       resolve(null);
     });
   });
@@ -48,6 +47,7 @@ const getDocumentFromGridFS = async (projectKey, versionId) => {
   const fileName = `${projectKey}_${versionId}.json`;
 
   const downloadStream = bucket.openDownloadStreamByName(fileName);
+
   const gridFSFileBuffer = await downloadStreamToBuffer(downloadStream);
 
   if (!gridFSFileBuffer) {
@@ -66,21 +66,22 @@ const saveDocumentToGridFS = async (flattenFigmaJson) => {
 
   const fileName = `${flattenFigmaJson.projectKey}_${flattenFigmaJson.versionId}.json`;
 
-  try {
-    const uploadStream = bucket.openUploadStream(fileName, {
-      contentType: "application/json",
-    });
+  const uploadStream = bucket.openUploadStream(fileName, {
+    contentType: "application/json",
+  });
 
-    await uploadFigmaJsonToGridFS(uploadStream, flattenFigmaJson);
+  const savedGridFSObject = await uploadStreamToGridFS(
+    uploadStream,
+    flattenFigmaJson,
+  );
 
-    const convertedDocument = convertObjectToMap(flattenFigmaJson);
-
-    return convertedDocument;
-  } catch (error) {
-    console.error("Error saving document to GridFS:", error);
-
-    throw error;
+  if (!savedGridFSObject) {
+    return null;
   }
+
+  const convertedDocument = convertObjectToMap(savedGridFSObject);
+
+  return convertedDocument;
 };
 
 module.exports = { getDocumentFromGridFS, saveDocumentToGridFS };
