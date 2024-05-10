@@ -97,11 +97,7 @@ const getCommonPages = async (req, res, next) => {
       return flattenedDocument;
     }
 
-    const gridFSDocument = await saveDocumentToGridFS(
-      document,
-      projectKey,
-      versionId,
-    );
+    const gridFSDocument = await saveDocumentToGridFS(document);
 
     return gridFSDocument;
   };
