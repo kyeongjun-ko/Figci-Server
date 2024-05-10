@@ -21,14 +21,8 @@ const uploadFigmaJsonToGridFS = (uploadStream, figmaJsonData) => {
 };
 
 const downloadStreamToBuffer = (downloadStream) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const gridFSFileChunks = [];
-
-    const timeout = setTimeout(() => {
-      downloadStream.destroy();
-
-      reject(new Error("GridFS retrieve timeout."));
-    }, 60000);
 
     downloadStream.on("data", (chunk) => {
       gridFSFileChunks.push(chunk);
@@ -37,15 +31,14 @@ const downloadStreamToBuffer = (downloadStream) => {
     downloadStream.on("end", () => {
       const gridFSFileBuffer = Buffer.concat(gridFSFileChunks);
 
-      clearTimeout(timeout);
       resolve(gridFSFileBuffer);
     });
 
     downloadStream.on("error", (err) => {
-      console.error("Error retrieving document from GridFS:", err);
+      console.error("Error retrieving document from GridFS:", err.message);
 
-      clearTimeout(timeout);
-      reject(err);
+      // reject(err.message);
+      resolve(null);
     });
   });
 };
@@ -54,30 +47,18 @@ const getDocumentFromGridFS = async (projectKey, versionId) => {
   const bucket = getBucket();
   const fileName = `${projectKey}_${versionId}.json`;
 
-  const gridFSFiles = await bucket.find({ filename: fileName }).toArray();
+  const downloadStream = bucket.openDownloadStreamByName(fileName);
+  const gridFSFileBuffer = await downloadStreamToBuffer(downloadStream);
 
-  if (gridFSFiles.length === 0) {
+  if (!gridFSFileBuffer) {
     return null;
   }
 
-  try {
-    const downloadStream = bucket.openDownloadStreamByName(fileName);
+  const gridFSFileContent = gridFSFileBuffer.toString();
+  const gridFSDocument = JSON.parse(gridFSFileContent);
+  const convertedDocument = convertObjectToMap(gridFSDocument);
 
-    const gridFSFileBuffer = await downloadStreamToBuffer(downloadStream);
-
-    if (gridFSFileBuffer) {
-      const gridFSFileContent = gridFSFileBuffer.toString();
-      const gridFSDocument = JSON.parse(gridFSFileContent);
-      const convertedDocument = convertObjectToMap(gridFSDocument);
-
-      return convertedDocument;
-    }
-  } catch (error) {
-    console.error("Error retrieving document from GridFS:", error);
-
-    throw error;
-  }
-  return null;
+  return convertedDocument;
 };
 
 const saveDocumentToGridFS = async (
