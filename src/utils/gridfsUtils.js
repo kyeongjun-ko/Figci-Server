@@ -61,13 +61,10 @@ const getDocumentFromGridFS = async (projectKey, versionId) => {
   return convertedDocument;
 };
 
-const saveDocumentToGridFS = async (
-  flattenFigmaJson,
-  projectKey,
-  versionId,
-) => {
+const saveDocumentToGridFS = async (flattenFigmaJson) => {
   const bucket = getBucket();
-  const fileName = `${projectKey}_${versionId}.json`;
+
+  const fileName = `${flattenFigmaJson.projectKey}_${flattenFigmaJson.versionId}.json`;
 
   try {
     const uploadStream = bucket.openUploadStream(fileName, {
