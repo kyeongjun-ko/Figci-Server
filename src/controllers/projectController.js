@@ -90,7 +90,7 @@ const getCommonPages = async (req, res, next) => {
 
     const documentSize = JSON.stringify(document).length;
 
-    if (documentSize <= 16 * 1024 * 1024) {
+    if (documentSize <= CONSTANT.MAX_DOCUMENT_SIZE) {
       const flattenedDocument = await Document.create(document);
 
       return flattenedDocument;
