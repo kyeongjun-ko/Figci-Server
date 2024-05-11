@@ -1,3 +1,5 @@
+const isOwnProperty = require("./isOwnProperty");
+
 const CONSTANT = require("../constants/constants");
 
 const flattenFigmaSubtree = (root) => {
@@ -51,7 +53,7 @@ const flattenFigmaSubtree = (root) => {
       };
 
       for (const key in node) {
-        if (Object.prototype.hasOwnProperty.call(node, key)) {
+        if (isOwnProperty(node, key)) {
           if (!CONSTANT.EXCLUDED_KEYS[key]) {
             newNode.property[key] = node[key];
           }

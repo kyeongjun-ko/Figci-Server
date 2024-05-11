@@ -1,6 +1,4 @@
-const isOwnProperty = (object, property) => {
-  return Object.prototype.hasOwnProperty.call(object, property);
-};
+const isOwnProperty = require("./isOwnProperty");
 
 const diffProperties = (
   beforeProperties,
