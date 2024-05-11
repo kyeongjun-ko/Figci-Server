@@ -11,6 +11,7 @@ const CONSTANTS = {
     children: true,
   },
   BUCKET_NAME: "documents",
+  MAX_DOCUMENT_SIZE: 16 * 1024 * 1024,
 };
 
 module.exports = CONSTANTS;
