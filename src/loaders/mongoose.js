@@ -18,6 +18,7 @@ const connectMongoDB = async () => {
 
 const initBucket = async () => {
   const db = mongoose.connection.client.db(CONFIG.DB_NAME);
+
   bucket = new GridFSBucket(db, { bucketName: CONSTANT.BUCKET_NAME });
 };
 
