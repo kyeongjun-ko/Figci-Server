@@ -11,18 +11,9 @@ const getDocument = async (projectKey, versionId) => {
     return document;
   }
 
-  try {
-    const documentFromGridFS = await getDocumentFromGridFS(
-      projectKey,
-      versionId,
-    );
+  const documentFromGridFS = await getDocumentFromGridFS(projectKey, versionId);
 
-    return documentFromGridFS;
-  } catch (err) {
-    console.error(err.message);
-
-    throw new Error(err);
-  }
+  return documentFromGridFS;
 };
 
 module.exports = getDocument;
