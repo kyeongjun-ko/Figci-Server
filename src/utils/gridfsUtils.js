@@ -1,6 +1,7 @@
 const { getBucket } = require("../loaders/mongoose");
 
 const convertObjectToMap = require("./convertObjectToMap");
+const logMemoryUsage = require("./logMemoryUsage");
 
 const uploadStreamToGridFS = (uploadStream, figmaJsonData) => {
   return new Promise((resolve) => {
@@ -43,6 +44,8 @@ const downloadStreamToBuffer = (downloadStream) => {
 };
 
 const getDocumentFromGridFS = async (projectKey, versionId) => {
+  logMemoryUsage("Get GridFS File - Start");
+
   const bucket = getBucket();
   const fileName = `${projectKey}_${versionId}.json`;
 
@@ -58,10 +61,14 @@ const getDocumentFromGridFS = async (projectKey, versionId) => {
   const gridFSDocument = JSON.parse(gridFSFileContent);
   const convertedDocument = convertObjectToMap(gridFSDocument);
 
+  logMemoryUsage("Get GridFS File - End");
+
   return convertedDocument;
 };
 
 const saveDocumentToGridFS = async (flattenFigmaJson) => {
+  logMemoryUsage("Save GridFS File - Start");
+
   const bucket = getBucket();
 
   const fileName = `${flattenFigmaJson.projectKey}_${flattenFigmaJson.versionId}.json`;
@@ -80,6 +87,8 @@ const saveDocumentToGridFS = async (flattenFigmaJson) => {
   }
 
   const convertedDocument = convertObjectToMap(savedGridFSObject);
+
+  logMemoryUsage("Save GridFS File - End");
 
   return convertedDocument;
 };

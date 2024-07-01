@@ -1,4 +1,5 @@
 const isOwnProperty = require("./isOwnProperty");
+const logMemoryUsage = require("./logMemoryUsage");
 
 const diffProperties = (
   beforeProperties,
@@ -61,6 +62,8 @@ const diffProperties = (
 };
 
 const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
+  logMemoryUsage("Get Diffing - Start");
+
   for (const [afterFrameId, afterFrame] of afterFrameList) {
     const beforeFrame = beforeFrameList.get(afterFrameId);
 
@@ -106,6 +109,8 @@ const getDiffing = async (beforeFrameList, afterFrameList, diffingResult) => {
       );
     }
   }
+
+  logMemoryUsage("Get Diffing - End");
 };
 
 module.exports = getDiffing;
